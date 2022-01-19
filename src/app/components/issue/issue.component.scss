@@ -1,0 +1,15 @@
+mat-card {
+  margin: 10px;
+
+  &:hover {
+    background: rgba(0, 0, 0, .04);
+  }
+
+  ::ng-deep .mat-card-header-text, .mat-card-content {
+    width: 100%;
+
+    mat-form-field {
+      width: 100%;
+    }
+  }
+}

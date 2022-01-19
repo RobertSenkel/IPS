@@ -1,0 +1,57 @@
+<mat-card *ngIf="!isEditMode && !isBlank; else editMode">
+  <mat-card-header>
+    <mat-card-title>{{ issueForm.get('title').value }}</mat-card-title>
+    <mat-card-subtitle>{{ issueForm.get('tags').value.join(', ') }}</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <div [innerHtml]="issueForm.get('text').value"></div>
+  </mat-card-content>
+
+  <mat-card-actions>
+    <button mat-button (click)="isEditMode=true">Edit</button>
+    <button mat-button (click)="removeElement.emit(issueForm.get('id').value)">Delete</button>
+  </mat-card-actions>
+</mat-card>
+
+<ng-template #editMode>
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <mat-form-field appearance="fill">
+          <mat-label>Title</mat-label>
+          <input matInput type="text" [formControl]="issueForm.get('title')">
+        </mat-form-field>
+      </mat-card-title>
+      <mat-card-subtitle>
+        <mat-form-field class="tag-selection" appearance="fill">
+          <mat-label>Tags</mat-label>
+          <mat-chip-list #chipList aria-label="Tag selection">
+            <mat-chip *ngFor="let tag of tags" (removed)="removeTag(tag)">
+              {{ tag }}
+              <mat-icon matChipRemove>cancel</mat-icon>
+            </mat-chip>
+            <input placeholder="New tag..." #tagInput [formControl]="tagCtrl" [matAutocomplete]="auto"
+              [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+              (matChipInputTokenEnd)="addTag($event)">
+          </mat-chip-list>
+          <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+            <mat-option *ngFor="let tag of filteredTags$ | async" [value]="tag">
+              {{ tag }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-form-field appearance="fill">
+        <mat-label>Text</mat-label>
+        <textarea matInput cdkTextareaAutosize [formControl]="issueForm.get('text')"></textarea>
+      </mat-form-field>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-button (click)="save()">{{ isBlank ? 'Add' : 'Save' }}</button>
+      <button *ngIf="isEditMode" mat-button (click)="isEditMode=false">Cancel</button>
+    </mat-card-actions>
+  </mat-card>
+</ng-template>
